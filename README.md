@@ -10,6 +10,10 @@ Personally, I dislike Access and don't want to teach or encourage my students to
 
 To that end, I have created this Python project which will use an SQLite database to present a screen that sufficiently replicates the functionality of the Access Query tool for the purposes of the GCSE Computer Science course.
 
+At the moment, I would describe the tool as not pretty but functional. Screenshot...
+
+![](screenshot.png)
+
 If you discover issues or have suggestions, please make contact with me. I'm happy to accept contributions from others that improve the project as well.
 
 ---
