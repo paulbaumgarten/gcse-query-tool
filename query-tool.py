@@ -33,14 +33,11 @@ class LocalDatabase:
         
     def read(self, sql, filter=None):
         # Query the database and return a list of key:val dicts
-        result = []
         if filter is not None:
             self.db.execute(sql, filter)
         else:
             self.db.execute(sql)
-        records = self.db.fetchall()
-        for row in records:
-            result.append(dict(row))
+        result = [ dict(row) for row in self.db.fetchall() ]
         return result
     
     def write(self, sql, data=None):
@@ -108,27 +105,25 @@ class App():
         
     def render(self):
         """ Create the query window """
-        # Labels
-        self.labels = [
-            tk.Label(self.window, text="Field:"),
-            tk.Label(self.window, text="Table:"),
-            tk.Label(self.window, text="Sort:"),
-            tk.Label(self.window, text="Show:"),
-            tk.Label(self.window, text="Criteria:"),
-            tk.Label(self.window, text="or:")
-        ]
-        x,y =20,20
-        for i in range(len(self.labels)):
-            self.labels[i].place(x=x, y=y)
-            y += 20
-        # Execute button
-        self.execute_button = tk.Button(self.window, text="Execute", command=self.execute)
-        self.execute_button.place(x=x,y=y)
         # Frame to contain fields
         self.container = tk.Frame(self.window)
-        self.container.place(x=80, y=20, width=710, height=560)
+        self.container.place(x=20, y=20, width=760, height=560)
         self.container.columnconfigure(0, pad=3)
         self.container.rowconfigure(0, pad=3)
+        # Labels
+        self.labels = [
+            tk.Label(self.container, text="Field:"),
+            tk.Label(self.container, text="Table:"),
+            tk.Label(self.container, text="Sort:"),
+            tk.Label(self.container, text="Show:"),
+            tk.Label(self.container, text="Criteria:"),
+            tk.Label(self.container, text="or:")
+        ]
+        for i in range(len(self.labels)):
+            self.labels[i].grid(column=0, row=i)
+        # Execute button
+        self.execute_button = tk.Button(self.container, text="Execute", command=self.execute)
+        self.execute_button.grid(column=0, row=len(self.labels))
         # Lists to hold all the widgets we will be drawing on screen
         self.widgets_field = []
         self.widgets_table = []
@@ -143,27 +138,27 @@ class App():
         for i in range(len(self.fields)):
             # Field combobox
             self.widgets_field.append( ttk.Combobox(self.container, width=13, values=fields_list) )
-            self.widgets_field[-1].grid(row=1, column=i)
+            self.widgets_field[-1].grid(row=0, column=i+1)
             self.widgets_field[-1].insert(0, "")
             # Table combobox
             self.widgets_table.append( ttk.Combobox(self.container, width=13, values=tables_list) )
-            self.widgets_table[-1].grid(row=2, column=i)
+            self.widgets_table[-1].grid(row=1, column=i+1)
             self.widgets_table[-1].insert(0, self.tables[0])
             # Sort combobox
             self.widgets_sort.append( ttk.Combobox(self.container, width=13, values=["","ASC","DESC"]) )
-            self.widgets_sort[-1].grid(row=3, column=i)
+            self.widgets_sort[-1].grid(row=2, column=i+1)
             # Show checkbox
             self.widgets_show.append( ttk.Checkbutton(self.container) )
             self.widgets_show[-1].state(['!alternate'])
-            self.widgets_show[-1].grid(row=4, column=i)
+            self.widgets_show[-1].grid(row=3, column=i+1)
             # Criteria entrybox
             self.widgets_criteria.append( tk.Entry(self.container, width=13) )
-            self.widgets_criteria[-1].grid(row=5, column=i)
+            self.widgets_criteria[-1].grid(row=4, column=i+1)
             # Or entrybox
             self.widgets_or.append( tk.Entry(self.container, width=13) )
-            self.widgets_or[-1].grid(row=6, column=i)
-        self.widget_query = tk.Label(self.container, width=(13*len(self.fields)))
-        self.widget_query.grid(row=7,columnspan=len(self.fields))
+            self.widgets_or[-1].grid(row=5, column=i+1)
+        self.widget_query = tk.Label(self.container, width=(13*len(self.fields)), anchor='w')
+        self.widget_query.grid(row=6,column=1,columnspan=len(self.fields))
     
     def execute(self):
         """ Execute the query as provided by the user """
@@ -207,6 +202,7 @@ class App():
         if len(sql_sort) > 0:
             sql += " ORDER BY " + ",".join(sql_sort)
         print("\nExecuting: "+sql)
+        self.widget_query['text'] = sql
         # Execute the query
         data = []
         try:
@@ -224,10 +220,10 @@ class App():
                 for j in range(len(self.fields)):
                     field_name = self.widgets_field[j].get()
                     if field_name in data[i]:
-                        self.results.append( tk.Label(self.container, text=data[i][field_name], borderwidth=1, relief="groove"))
+                        self.results.append( tk.Label(self.container, text=data[i][field_name], borderwidth=1, relief="groove", anchor='w'))
                     else:
                         self.results.append( tk.Label(self.container, text=""))
-                    self.results[-1].grid(row=8+i, column=j, sticky="nsew")
+                    self.results[-1].grid(row=8+i, column=j+1, sticky="nsew")
 
 ### MAIN ###
 if __name__ == "__main__":
