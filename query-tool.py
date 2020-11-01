@@ -1,19 +1,28 @@
 """
+
 GCSE Computer Science "query-by-example" tool.
-Intended to replicate the query tool look that is used in the GCSE exams for use with SQLite databases.
+
+Purpose: 
+
+    This is intended to replicate the query tool look that is used in the GCSE exams for use with SQLite databases.
 
 Known issues / to-do list:
- * Needs vertical & horizontal scrolling for when dataset requires it.
- * Allow for SQL queries that join multiple tables.
 
-Project repo @ http://github.com/paulbaumgarten/gcse-query-tool
+    * Needs vertical & horizontal scrolling for when dataset requires it.
+    * Allow for SQL queries that join multiple tables.
 
-Paul Baumgarten, November 2020
-http://pbaumgarten.com/igcse-compsci
+Project repo: 
+    
+    http://github.com/paulbaumgarten/gcse-query-tool
+
+Author: 
+
+    Paul Baumgarten, November 2020
+    http://pbaumgarten.com/igcse-compsci
+
 """
 
-# Only importing from the standard libraries
-# (want to keep it simple for inexperienced programmers to be able to get this to run)
+# Only importing from standard libraries (in order to keep it simple for less experienced programmers to get this to run without the hassle of installing packages)
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import filedialog
@@ -44,6 +53,8 @@ class LocalDatabase:
         """
         Example calls using the optional data parameter
         .write("REPLACE INTO table (field1,field2,field3) VALUES (?,?,?);", ["a","b","c"])
+
+        Refer to "parameter substitution" at https://docs.python.org/3.8/library/sqlite3.html
         """
         rows_affected = 0
         if data and isinstance(data, list):
@@ -59,13 +70,14 @@ class App():
         # Create the window
         self.parent = parent
         self.window = tk.Toplevel()
-        self.window.geometry("800x600")
+        self.window.geometry("850x600")
         self.window.title("GCSE CompSci Query tool")
         self.window.protocol("WM_DELETE_WINDOW", self.window.quit)
         # Open an SQLite database
         self.open_database()
         # Render screen
-        self.render()
+        self.render_form()
+        # Initialise database query results
         self.results = []
 
     def open_database(self):
@@ -103,26 +115,26 @@ class App():
                     self.fields.append( {"table": table, "field": key} )
         print("Found fields:",self.fields)
         
-    def render(self):
+    def render_form(self):
         """ Create the query window """
         # Frame to contain fields
         self.container = tk.Frame(self.window)
-        self.container.place(x=20, y=20, width=760, height=560)
-        self.container.columnconfigure(0, pad=3)
-        self.container.rowconfigure(0, pad=3)
+        self.container.pack()
+        self.container.columnconfigure(0, pad=50)
+        self.container.rowconfigure(0, pad=50)
         # Labels
         self.labels = [
-            tk.Label(self.container, text="Field:"),
-            tk.Label(self.container, text="Table:"),
-            tk.Label(self.container, text="Sort:"),
-            tk.Label(self.container, text="Show:"),
-            tk.Label(self.container, text="Criteria:"),
-            tk.Label(self.container, text="or:")
+            tk.Label(self.container, text="Field:", anchor='w'),
+            tk.Label(self.container, text="Table:", anchor='w'),
+            tk.Label(self.container, text="Sort:", anchor='w'),
+            tk.Label(self.container, text="Show:", anchor='w'),
+            tk.Label(self.container, text="Criteria:", anchor='w'),
+            tk.Label(self.container, text="or:", anchor='w')
         ]
         for i in range(len(self.labels)):
             self.labels[i].grid(column=0, row=i)
         # Execute button
-        self.execute_button = tk.Button(self.container, text="Execute", command=self.execute)
+        self.execute_button = tk.Button(self.container, text="Execute", command=self.execute_query)
         self.execute_button.grid(column=0, row=len(self.labels))
         # Lists to hold all the widgets we will be drawing on screen
         self.widgets_field = []
@@ -144,6 +156,7 @@ class App():
             self.widgets_table.append( ttk.Combobox(self.container, width=13, values=tables_list) )
             self.widgets_table[-1].grid(row=1, column=i+1)
             self.widgets_table[-1].insert(0, self.tables[0])
+            self.widgets_table[-1].bind("<<ComboboxSelected>>", self.change_of_table)
             # Sort combobox
             self.widgets_sort.append( ttk.Combobox(self.container, width=13, values=["","ASC","DESC"]) )
             self.widgets_sort[-1].grid(row=2, column=i+1)
@@ -159,8 +172,12 @@ class App():
             self.widgets_or[-1].grid(row=5, column=i+1)
         self.widget_query = tk.Label(self.container, width=(13*len(self.fields)), anchor='w')
         self.widget_query.grid(row=6,column=1,columnspan=len(self.fields))
+
+    def change_of_table(self):
+        # TO-DO
+        pass
     
-    def execute(self):
+    def execute_query(self):
         """ Execute the query as provided by the user """
         sql_fields = []
         sql_tables = []
