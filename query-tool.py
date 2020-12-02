@@ -183,6 +183,7 @@ class App():
         sql_tables = []
         sql_sort = []
         sql_where = []
+        sql_where_or = []
         for i in range(len(self.fields)):
             # Full qualified field name
             # TODO - Will need this for table joins - fqfn = "`"+self.widgets_table[i].get() +"."+self.widgets_field[i].get()+"`"
@@ -200,10 +201,11 @@ class App():
             # If a WHERE clause has been specified
             if self.widgets_criteria[i].get() != "":
                 sql_where_this = fqfn + self.widgets_criteria[i].get()
-                # Only accept an OR clause if the CRITERIA entry box has also been provided
-                if self.widgets_or[i].get() != "":
-                    sql_where_this += " OR " + fqfn + self.widgets_or[i].get()
                 sql_where.append(sql_where_this)
+            # OR clause
+            if self.widgets_or[i].get() != "":
+                sql_where_this = fqfn + self.widgets_or[i].get()
+                sql_where_or.append(sql_where_this)
         # Check we were given something to do
         if len(sql_fields) == 0:
             messagebox.showerror("Nothing to do","You haven't asked for any data\n\nCheck you have\n1. Selected a field\n2. Selected the table\n3. Turned on 'show'")
@@ -216,6 +218,8 @@ class App():
         sql = "SELECT " + ",".join(sql_fields) + " FROM " + sql_tables[0]
         if len(sql_where) > 0:
             sql += " WHERE (" + ") AND (".join(sql_where) + ")"
+            if len(sql_where_or) > 0:
+                sql += " OR ( " + ") OR (".join(sql_where_or) + ")"
         if len(sql_sort) > 0:
             sql += " ORDER BY " + ",".join(sql_sort)
         print("\nExecuting: "+sql)
