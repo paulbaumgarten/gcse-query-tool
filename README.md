@@ -4,7 +4,7 @@ A Python tool to emulate the gcse query screen for use with SQLite databases.
 
 I'm a teacher of iGCSE Computer Science. The databases section of the course, while it does not explicitly require the use of Microsoft Access, infers it by requiring students to complete exam questions with a query tool that visually resembles the Access Query tool. An example of the GCSE question format follows...
 
-![](gcse-question-example.png)
+![](./screenshots/gcse-question-example.png)
 
 Personally, I dislike Access and don't want to teach or encourage my students to use it. I would much rather they learn an SQL based database, so I teach using SQLite. However, in order to properly prepare my students for their external exam, they do need some familiarity with this query screen.
 
@@ -12,7 +12,7 @@ To that end, I have created this Python project which will use an SQLite databas
 
 At the moment, I would describe the tool as not pretty but functional. Screenshot...
 
-![](screenshot.png)
+![](./screenshots/screenshot.png)
 
 If you discover issues or have suggestions, please make contact with me. I'm happy to accept contributions from others that improve the project as well.
 
